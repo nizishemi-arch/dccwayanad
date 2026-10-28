@@ -1,0 +1,945 @@
+```html
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>വയനാട് ഡി.സി.സി - ഡിജിറ്റൽ ഡാറ്റാബേസ്</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans Malayalam & Manrope) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Malayalam:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        incSaffron: '#FF9933',
+                        incGreen: '#138808',
+                        incNavy: '#000080',
+                    },
+                    fontFamily: {
+                        malayalam: ['Noto Sans Malayalam', 'Manrope', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans Malayalam', 'Manrope', sans-serif;
+            background-color: #f8fafc;
+        }
+        .tricolor-stripe {
+            height: 5px;
+            background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%, #138808 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Top Flag Bar -->
+    <div class="tricolor-stripe w-full sticky top-0 z-50"></div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-[5px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-full border border-incNavy flex flex-col overflow-hidden justify-between p-0.5 bg-white shadow-sm">
+                    <div class="h-1/3 bg-incSaffron"></div>
+                    <div class="h-1/3 bg-white flex items-center justify-center">
+                        <i class="fa-solid fa-hand text-incNavy text-[10px]"></i>
+                    </div>
+                    <div class="h-1/3 bg-incGreen"></div>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-xl font-bold text-slate-900 leading-tight">വയനാട് ജില്ലാ കോൺഗ്രസ് കമ്മിറ്റി</h1>
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium">ഡിജിറ്റൽ ഡാറ്റാബേസ് & ലെവി ട്രാക്കർ (DCC Wayanad)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <button onclick="exportData()" title="ഡാറ്റ ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-lg border border-slate-300 font-semibold flex items-center gap-1 transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="hidden sm:inline">ബാക്കപ്പ്</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Navigation Bar -->
+        <nav class="bg-slate-900 text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 flex overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn active border-b-4 border-incSaffron bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold flex items-center space-x-2 space-x-reverse whitespace-nowrap">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>ഡാഷ്‌ബോർഡ്</span>
+                </button>
+                <button onclick="switchTab('bearers')" id="tab-bearers" class="nav-btn border-b-4 border-transparent hover:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold flex items-center space-x-2 space-x-reverse whitespace-nowrap">
+                    <i class="fa-solid fa-users"></i>
+                    <span>ഭാരവാഹികളുടെ വിവരങ്ങൾ</span>
+                </button>
+                <button onclick="switchTab('levy')" id="tab-levy" class="nav-btn border-b-4 border-transparent hover:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold flex items-center space-x-2 space-x-reverse whitespace-nowrap">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <span>ജനപ്രതിനിധി ലെവി & കുടിശിക</span>
+                </button>
+                <button onclick="switchTab('activities')" id="tab-activities" class="nav-btn border-b-4 border-transparent hover:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold flex items-center space-x-2 space-x-reverse whitespace-nowrap">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>പാർട്ടി പ്രവർത്തനങ്ങൾ</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- 1. DASHBOARD TAB -->
+        <section id="content-dashboard" class="tab-content space-y-6">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-r from-slate-900 via-incNavy to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-2">വയനാട് ഡി.സി.സി ഡിജിറ്റൽ മാനേജ്‌മെന്റ് സിസ്റ്റം</h2>
+                    <p class="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
+                        2025 ജനുവരി മുതലുള്ള ജനപ്രതിനിധികളുടെ ലെവി തുകയും, മുൻകാല കുടിശികയും അടയ്ക്കാത്ത മാസങ്ങളുടെ എൻട്രികളും ഇവിടെ മാനുവലായി രേഖപ്പെടുത്താം.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <button onclick="openLevyModal()" class="bg-incGreen hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 shadow transition">
+                            <i class="fa-solid fa-plus-circle"></i> ലെവി / കുടിശിക റെക്കോർഡ് ചെയ്യുക
+                        </button>
+                        <button onclick="openBearerModal()" class="bg-incSaffron hover:bg-amber-600 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 shadow transition">
+                            <i class="fa-solid fa-user-plus"></i> ഭാരവാഹിയെ ചേർക്കുക
+                        </button>
+                        <button onclick="openActivityModal()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-calendar-plus"></i> പ്രവർത്തനം ചേർക്കുക
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Realtime Metrics Summary -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">ഭാരവാഹികൾ</p>
+                        <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-bearers-count">0</h3>
+                        <p class="text-[11px] text-slate-400 mt-1">ആകെ അംഗങ്ങൾ</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-incNavy rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">ആകെ പിരിഞ്ഞു കിട്ടിയത്</p>
+                        <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="stat-levy-paid">₹0</h3>
+                        <p class="text-[11px] text-slate-400 mt-1" id="stat-levy-paid-count">0 റെക്കോർഡുകൾ പൂർണ്ണം</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-vault"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">ആകെ കുടിശിക തുക</p>
+                        <h3 class="text-2xl font-bold text-rose-600 mt-1" id="stat-levy-pending">₹0</h3>
+                        <p class="text-[11px] text-slate-400 mt-1" id="stat-levy-pending-count">മുൻകാല കുടിശിക ഉൾപ്പെടെ</p>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase">പ്രവർത്തനങ്ങൾ</p>
+                        <h3 class="text-2xl font-bold text-amber-600 mt-1" id="stat-activities-count">0</h3>
+                        <p class="text-[11px] text-slate-400 mt-1">വാർത്തകൾ / യോഗങ്ങൾ</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Summary Views -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Levy Status -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-indian-rupee-sign text-incGreen"></i> പുതിയ ലെവി & കുടിശിക എൻട്രികൾ
+                        </h3>
+                        <button onclick="switchTab('levy')" class="text-xs text-incNavy font-bold hover:underline">എല്ലാം കാണുക</button>
+                    </div>
+                    <div id="dash-recent-levy" class="space-y-3">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+                <!-- Recent Office Bearers Added -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-users text-incNavy"></i> ഡി.സി.സി ഭാരവാഹികൾ
+                        </h3>
+                        <button onclick="switchTab('bearers')" class="text-xs text-incNavy font-bold hover:underline">എല്ലാം കാണുക</button>
+                    </div>
+                    <div id="dash-recent-bearers" class="space-y-3">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2. OFFICE BEARERS TAB -->
+        <section id="content-bearers" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">ഭാരവാഹികളുടെ വിവരങ്ങൾ</h2>
+                    <p class="text-xs text-slate-500">ഡി.സി.സി, ബ്ലോക്ക്, മണ്ഡലം ഭാരവാഹികളുടെ മാനുവൽ പട്ടിക</p>
+                </div>
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <input type="text" id="bearer-search" oninput="renderBearers()" placeholder="പേര് / തസ്തിക സെർച്ച് ചെയ്യുക..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-incNavy flex-grow sm:flex-grow-0">
+                    <select id="bearer-filter-area" onchange="renderBearers()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold outline-none focus:ring-2 focus:ring-incNavy">
+                        <option value="ALL">എല്ലാ മേഖലയും</option>
+                        <option value="കൽപ്പറ്റ">കൽപ്പറ്റ</option>
+                        <option value="സുൽത്താൻ ബത്തേരി">സുൽത്താൻ ബത്തേരി</option>
+                        <option value="മാനന്തവാടി">മാനന്തവാടി</option>
+                        <option value="മറ്റുള്ളവ">മറ്റുള്ളവ</option>
+                    </select>
+                    <button onclick="openBearerModal()" class="bg-incNavy hover:bg-blue-900 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition">
+                        <i class="fa-solid fa-plus"></i> ഭാരവാഹിയെ ചേർക്കുക
+                    </button>
+                </div>
+            </div>
+
+            <div id="bearers-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamically Populated -->
+            </div>
+        </section>
+
+
+        <!-- 3. LEVY TRACKER TAB -->
+        <section id="content-levy" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">ജനപ്രതിനിധികളുടെ ലെവി & കുടിശിക ട്രാക്കർ</h2>
+                        <p class="text-xs text-slate-500">2025 ജനുവരി മുതലുള്ള ലെവിയും മുൻകാല കുടിശിക തുകയും അടയ്ക്കാത്ത മാസങ്ങളും</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportLevyCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-lg text-xs border border-slate-300 flex items-center gap-1 transition">
+                            <i class="fa-solid fa-file-excel text-emerald-700"></i> Excel/CSV ഡൗൺലോഡ്
+                        </button>
+                        <button onclick="openLevyModal()" class="bg-incGreen hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow transition">
+                            <i class="fa-solid fa-plus-circle"></i> ലെവി / കുടിശിക ചേർക്കുക
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">തിരയുക (പേര്/ഫോൺ/മണ്ഡലം)</label>
+                        <input type="text" id="levy-search" oninput="renderLevy()" placeholder="സെർച്ച് ചെയ്യുക..." class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">തലം (Designation Level)</label>
+                        <select id="levy-filter-level" onchange="renderLevy()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs outline-none">
+                            <option value="ALL">എല്ലാ തലങ്ങളും</option>
+                            <option value="MP">ലോക്‌സഭ (MP)</option>
+                            <option value="MLA">നിയമസഭ (MLA)</option>
+                            <option value="ജില്ലാ പഞ്ചായത്ത്">ജില്ലാ പഞ്ചായത്ത്</option>
+                            <option value="ബ്ലോക്ക് പഞ്ചായത്ത്">ബ്ലോക്ക് പഞ്ചായത്ത്</option>
+                            <option value="ഗ്രാമപഞ്ചായത്ത്/നഗരസഭ">ഗ്രാമപഞ്ചായത്ത്/നഗരസഭ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">കുടിശിക സ്റ്റാറ്റസ്</label>
+                        <select id="levy-filter-status" onchange="renderLevy()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs outline-none">
+                            <option value="ALL">എല്ലാം കാണിക്കുക</option>
+                            <option value="Pending">കുടിശിക ഉള്ളവ (Pending Dues)</option>
+                            <option value="Paid">പൂർണ്ണമായും അടച്ചവ (Paid)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-100 text-slate-800 uppercase font-bold text-[11px] border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">ജനപ്രതിനിധി</th>
+                                <th class="p-3">തലം & മണ്ഡലം</th>
+                                <th class="p-3 text-right">മാസാന്ത ലെവി</th>
+                                <th class="p-3 text-right text-amber-800 bg-amber-50/50">മുൻകാല കുടിശിക</th>
+                                <th class="p-3 text-right text-emerald-800 bg-emerald-50/50">അടച്ച തുക</th>
+                                <th class="p-3 text-right text-rose-800 bg-rose-50/50">ആകെ കുടിശിക</th>
+                                <th class="p-3">അടയ്ക്കാത്ത മാസങ്ങൾ</th>
+                                <th class="p-3 text-center">സ്റ്റാറ്റസ്</th>
+                                <th class="p-3 text-center">നടപടി</th>
+                            </tr>
+                        </thead>
+                        <tbody id="levy-table-body" class="divide-y divide-slate-200 bg-white">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Footer -->
+                <div class="mt-4 p-4 bg-slate-900 text-white rounded-lg flex flex-col sm:flex-row justify-between items-center text-xs">
+                    <div>രേഖപ്പെടുത്തിയ ആകെ ആൾക്കാർ: <span id="levy-count-tag" class="font-bold text-incSaffron">0</span></div>
+                    <div class="flex flex-wrap gap-4 font-semibold mt-2 sm:mt-0">
+                        <span>ആകെ മുൻകാല കുടിശിക: <strong class="text-amber-400" id="levy-sum-previous">₹0</strong></span>
+                        <span>ആകെ പിരിഞ്ഞ തുക: <strong class="text-emerald-400" id="levy-sum-collected">₹0</strong></span>
+                        <span>ആകെ അടയ്ക്കാനുള്ള ബാക്കി കുടിശിക: <strong class="text-rose-400 text-sm" id="levy-sum-pending">₹0</strong></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 4. ACTIVITIES TAB -->
+        <section id="content-activities" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">പാർട്ടി പ്രവർത്തനങ്ങൾ & യോഗങ്ങൾ</h2>
+                    <p class="text-xs text-slate-500">സമരങ്ങൾ, പരിപാടികൾ, തീരുമാനങ്ങൾ എന്നിവ രേഖപ്പെടുത്തുക</p>
+                </div>
+                <button onclick="openActivityModal()" class="bg-incSaffron hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition">
+                    <i class="fa-solid fa-plus"></i> പുതിയ പ്രവർത്തനം ചേർക്കുക
+                </button>
+            </div>
+
+            <div id="activities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamically Populated -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-white font-bold mb-1">വയനാട് ജില്ലാ കോൺഗ്രസ് കമ്മിറ്റി (INC Wayanad)</p>
+            <p>&copy; വയനാട് ഡി.സി.സി ഡിജിറ്റൽ സെൽ. ലെവി & ഡാറ്റാബേസ് പോർട്ടൽ.</p>
+        </div>
+    </footer>
+
+
+    <!-- MODALS -->
+
+    <!-- 1. OFFICE BEARER MODAL -->
+    <div id="bearer-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('bearer-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold text-slate-900 mb-4 border-b pb-2" id="bearer-modal-title">ഭാരവാഹിയുടെ വിവരം ചേർക്കുക</h3>
+            <form id="bearer-form" onsubmit="handleSaveBearer(event)" class="space-y-3">
+                <input type="hidden" id="bearer-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">പേര് *</label>
+                    <input type="text" id="bearer-name" required placeholder="പേര് ടൈപ്പ് ചെയ്യുക..." class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incNavy">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">തസ്തിക (Designation) *</label>
+                    <input type="text" id="bearer-role" required placeholder="ഉദാ: ഡി.സി.സി പ്രസിഡന്റ് / ജനറൽ സെക്രട്ടറി" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incNavy">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">മേഖല / മണ്ഡലം *</label>
+                    <select id="bearer-area" required class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incNavy">
+                        <option value="കൽപ്പറ്റ">കൽപ്പറ്റ</option>
+                        <option value="സുൽത്താൻ ബത്തേരി">സുൽത്താൻ ബത്തേരി</option>
+                        <option value="മാനന്തവാടി">മാനന്തവാടി</option>
+                        <option value="മറ്റുള്ളവ">മറ്റുള്ളവ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ഫോൺ നമ്പർ *</label>
+                    <input type="tel" id="bearer-phone" required placeholder="98XXXXXXXX" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incNavy">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ഫോട്ടോ ലിങ്ക് / URL (Optional)</label>
+                    <input type="url" id="bearer-photo" placeholder="https://..." class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incNavy">
+                </div>
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('bearer-modal')" class="px-4 py-2 border rounded-lg text-xs font-bold text-slate-600">റദ്ദാക്കുക</button>
+                    <button type="submit" class="px-4 py-2 bg-incNavy text-white rounded-lg text-xs font-bold hover:bg-blue-900">സേവ് ചെയ്യുക</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 2. LEVY MODAL (WITH PREVIOUS ARREARS & UNPAID MONTHS) -->
+    <div id="levy-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative my-6">
+            <button onclick="closeModal('levy-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold text-slate-900 mb-4 border-b pb-2" id="levy-modal-title">ജനപ്രതിനിധി ലെവി & കുടിശിക ചേർക്കുക</h3>
+            
+            <form id="levy-form" onsubmit="handleSaveLevy(event)" class="space-y-3">
+                <input type="hidden" id="levy-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ജനപ്രതിനിധിയുടെ പേര് *</label>
+                    <input type="text" id="levy-name" required placeholder="പേര് രേഖപ്പെടുത്തുക..." class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incGreen">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">തലം (Designation) *</label>
+                        <select id="levy-level" required class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incGreen">
+                            <option value="MP">MP (എം.പി)</option>
+                            <option value="MLA">MLA (എം.എൽ.എ)</option>
+                            <option value="ജില്ലാ പഞ്ചായത്ത്">ജില്ലാ പഞ്ചായത്ത്</option>
+                            <option value="ബ്ലോക്ക് പഞ്ചായത്ത്">ബ്ലോക്ക് പഞ്ചായത്ത്</option>
+                            <option value="ഗ്രാമപഞ്ചായത്ത്/നഗരസഭ">ഗ്രാമപഞ്ചായത്ത്/നഗരസഭ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">മണ്ഡലം / തദ്ദേശ സ്ഥാപനം *</label>
+                        <input type="text" id="levy-constituency" required placeholder="ഉദാ: കൽപ്പറ്റ" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incGreen">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ഫോൺ നമ്പർ</label>
+                    <input type="tel" id="levy-phone" placeholder="98XXXXXXXX" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incGreen">
+                </div>
+
+                <!-- Financial Group -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
+                    <p class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1 flex justify-between items-center">
+                        <span>ലെവി & കുടിശിക തുക കണക്ക്</span>
+                        <span class="text-[10px] text-slate-500 font-normal">(2025 ജനുവരി മുതലുള്ളത്)</span>
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-amber-800 mb-1">മുൻകാല കുടിശിക (₹)</label>
+                            <input type="number" id="levy-previous-arrears" oninput="calculateTotalPending()" min="0" placeholder="0" class="w-full px-2.5 py-1.5 border border-amber-300 bg-amber-50/40 rounded-lg text-xs outline-none focus:ring-2 focus:ring-amber-500 font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">പ്രതിമാസ ലെവി (₹) *</label>
+                            <input type="number" id="levy-target" oninput="calculateTotalPending()" required min="0" placeholder="1000" class="w-full px-2.5 py-1.5 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incGreen font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-emerald-800 mb-1">ഇതുവരെ അടച്ച തുക (₹) *</label>
+                            <input type="number" id="levy-paid" oninput="calculateTotalPending()" required min="0" placeholder="0" class="w-full px-2.5 py-1.5 border border-emerald-300 bg-emerald-50/40 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
+                        </div>
+                    </div>
+
+                    <div class="pt-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-rose-700">ആകെ ബാക്കി കുടിശിക തുക (₹)</label>
+                            <span class="text-[10px] text-slate-500">(സ്വയം കണക്കാക്കും)</span>
+                        </div>
+                        <input type="number" id="levy-pending" readonly class="w-full px-3 py-2 border border-rose-300 bg-rose-50 text-rose-900 font-bold rounded-lg text-sm outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">അടയ്ക്കാത്ത മാസങ്ങൾ / വിവരണം (Unpaid Months)</label>
+                    <textarea id="levy-unpaid-months" rows="2" placeholder="ഉദാ: 2025 ജനുവരി, ഫെബ്രുവരി, മാർച്ച് മാസങ്ങൾ ബാക്കി" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incGreen"></textarea>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-2 border-t">
+                    <button type="button" onclick="closeModal('levy-modal')" class="px-4 py-2 border rounded-lg text-xs font-bold text-slate-600">റദ്ദാക്കുക</button>
+                    <button type="submit" class="px-4 py-2 bg-incGreen text-white rounded-lg text-xs font-bold hover:bg-emerald-800">സേവ് ചെയ്യുക</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 3. ACTIVITY MODAL -->
+    <div id="activity-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('activity-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold text-slate-900 mb-4 border-b pb-2" id="act-modal-title">പ്രവർത്തനം / വാർത്ത ചേർക്കുക</h3>
+            <form id="activity-form" onsubmit="handleSaveActivity(event)" class="space-y-3">
+                <input type="hidden" id="act-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">തലക്കെട്ട് *</label>
+                    <input type="text" id="act-title" required placeholder="തലക്കെട്ട് എൻ്റർ ചെയ്യുക..." class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incSaffron">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">തീയതി *</label>
+                        <input type="date" id="act-date" required class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incSaffron">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">സ്ഥലം *</label>
+                        <input type="text" id="act-location" required placeholder="ഉദാ: കൽപ്പറ്റ" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incSaffron">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">വിശദാംശങ്ങൾ *</label>
+                    <textarea id="act-desc" rows="3" required placeholder="വിവരങ്ങൾ ടൈപ്പ് ചെയ്യുക..." class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-incSaffron"></textarea>
+                </div>
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('activity-modal')" class="px-4 py-2 border rounded-lg text-xs font-bold text-slate-600">റദ്ദാക്കുക</button>
+                    <button type="submit" class="px-4 py-2 bg-incSaffron text-slate-950 font-bold rounded-lg text-xs hover:bg-amber-600">സേവ് ചെയ്യുക</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Data Persistence via LocalStorage
+        let bearers = JSON.parse(localStorage.getItem('dcc_v3_bearers')) || [];
+        let levies = JSON.parse(localStorage.getItem('dcc_v3_levies')) || [];
+        let activities = JSON.parse(localStorage.getItem('dcc_v3_activities')) || [];
+
+        window.onload = function() {
+            renderDashboard();
+            renderBearers();
+            renderLevy();
+            renderActivities();
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('border-incSaffron', 'bg-slate-800');
+                btn.classList.add('border-transparent');
+            });
+
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`tab-${tabId}`);
+            activeNav.classList.remove('border-transparent');
+            activeNav.classList.add('border-incSaffron', 'bg-slate-800');
+
+            if(tabId === 'dashboard') renderDashboard();
+        }
+
+        function saveData() {
+            localStorage.setItem('dcc_v3_bearers', JSON.stringify(bearers));
+            localStorage.setItem('dcc_v3_levies', JSON.stringify(levies));
+            localStorage.setItem('dcc_v3_activities', JSON.stringify(activities));
+            
+            renderDashboard();
+            renderBearers();
+            renderLevy();
+            renderActivities();
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // Formula: Total Pending = (Previous Arrears + Target Levy) - Paid
+        function calculateTotalPending() {
+            const prevArrears = Number(document.getElementById('levy-previous-arrears').value) || 0;
+            const target = Number(document.getElementById('levy-target').value) || 0;
+            const paid = Number(document.getElementById('levy-paid').value) || 0;
+            
+            const totalPending = Math.max(0, (prevArrears + target) - paid);
+            document.getElementById('levy-pending').value = totalPending;
+        }
+
+
+        // 1. DASHBOARD RENDERER
+        function renderDashboard() {
+            document.getElementById('stat-bearers-count').innerText = bearers.length;
+            
+            const totalPaid = levies.reduce((acc, c) => acc + (Number(c.paid) || 0), 0);
+            const totalPending = levies.reduce((acc, c) => acc + (Number(c.pending) || 0), 0);
+            const fullyPaidCount = levies.filter(l => Number(l.pending) <= 0).length;
+
+            document.getElementById('stat-levy-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+            document.getElementById('stat-levy-paid-count').innerText = `${fullyPaidCount} പേർ കുടിശികയില്ലാതെ അടച്ചു`;
+            
+            document.getElementById('stat-levy-pending').innerText = `₹${totalPending.toLocaleString('en-IN')}`;
+            document.getElementById('stat-activities-count').innerText = activities.length;
+
+            // Recent Levy List in Dashboard
+            const recLevyContainer = document.getElementById('dash-recent-levy');
+            if(levies.length === 0) {
+                recLevyContainer.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">ലെവി റെക്കോർഡുകൾ ഒന്നുമില്ല. എന്ററി ചെയ്യുക.</p>`;
+            } else {
+                recLevyContainer.innerHTML = levies.slice(0, 4).map(l => {
+                    const isPending = Number(l.pending) > 0;
+                    return `
+                        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                            <div>
+                                <p class="font-bold text-xs text-slate-800">${l.name} <span class="text-[10px] text-slate-400 font-normal">(${l.level})</span></p>
+                                <p class="text-[10px] text-slate-500">അടച്ചത്: ₹${Number(l.paid).toLocaleString('en-IN')} ${l.unpaidMonths ? '| ' + l.unpaidMonths : ''}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold block ${isPending ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
+                                    ${isPending ? `ആകെ കുടിശിക: ₹${Number(l.pending).toLocaleString('en-IN')}` : 'പൂർണ്ണം'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Recent Bearers List
+            const recBearersContainer = document.getElementById('dash-recent-bearers');
+            if(bearers.length === 0) {
+                recBearersContainer.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">ഭാരവാഹികളുടെ വിവരം ചേർത്തിട്ടില്ല.</p>`;
+            } else {
+                recBearersContainer.innerHTML = bearers.slice(0, 3).map(b => `
+                    <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">${b.name}</p>
+                            <p class="text-[10px] text-incNavy font-semibold">${b.role} (${b.area})</p>
+                        </div>
+                        <span class="text-xs text-slate-500"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${b.phone}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+
+        // 2. BEARERS LOGIC
+        function openBearerModal(editId = null) {
+            document.getElementById('bearer-form').reset();
+            document.getElementById('bearer-id').value = '';
+            document.getElementById('bearer-modal-title').innerText = 'ഭാരവാഹിയുടെ വിവരം ചേർക്കുക';
+            
+            if(editId) {
+                const b = bearers.find(x => x.id === editId);
+                if(b) {
+                    document.getElementById('bearer-id').value = b.id;
+                    document.getElementById('bearer-name').value = b.name;
+                    document.getElementById('bearer-role').value = b.role;
+                    document.getElementById('bearer-area').value = b.area;
+                    document.getElementById('bearer-phone').value = b.phone;
+                    document.getElementById('bearer-photo').value = b.photo || '';
+                    document.getElementById('bearer-modal-title').innerText = 'ഭാരവാഹിയുടെ വിവരം തിരുത്തുക';
+                }
+            }
+            openModal('bearer-modal');
+        }
+
+        function handleSaveBearer(e) {
+            e.preventDefault();
+            const id = document.getElementById('bearer-id').value;
+            const bearerObj = {
+                id: id ? Number(id) : Date.now(),
+                name: document.getElementById('bearer-name').value,
+                role: document.getElementById('bearer-role').value,
+                area: document.getElementById('bearer-area').value,
+                phone: document.getElementById('bearer-phone').value,
+                photo: document.getElementById('bearer-photo').value || 'https://placehold.co/100x100/000080/FFFFFF?text=INC'
+            };
+
+            if(id) {
+                bearers = bearers.map(b => b.id === Number(id) ? bearerObj : b);
+            } else {
+                bearers.unshift(bearerObj);
+            }
+
+            saveData();
+            closeModal('bearer-modal');
+        }
+
+        function deleteBearer(id) {
+            if(confirm('ഈ ഭാരവാഹിയെ നീക്കം ചെയ്യണമെന്ന് ഉറപ്പാണോ?')) {
+                bearers = bearers.filter(b => b.id !== id);
+                saveData();
+            }
+        }
+
+        function renderBearers() {
+            const search = document.getElementById('bearer-search').value.toLowerCase();
+            const area = document.getElementById('bearer-filter-area').value;
+            const container = document.getElementById('bearers-grid');
+
+            const filtered = bearers.filter(b => {
+                const matchSearch = b.name.toLowerCase().includes(search) || b.role.toLowerCase().includes(search);
+                const matchArea = area === 'ALL' || b.area === area;
+                return matchSearch && matchArea;
+            });
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-xs bg-white rounded-xl border">ഭാരവാഹികളുടെ പട്ടിക ശൂന്യമാണ്. മുകളിലെ ബട്ടൺ ഉപയോഗിച്ച് വിവരങ്ങൾ ചേർക്കുക.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(b => `
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center space-x-3 space-x-reverse relative">
+                    <img src="${b.photo}" alt="${b.name}" class="w-14 h-14 rounded-full object-cover border border-slate-200">
+                    <div class="flex-grow">
+                        <span class="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold">${b.area}</span>
+                        <h4 class="font-bold text-slate-900 text-sm mt-0.5">${b.name}</h4>
+                        <p class="text-xs text-incNavy font-semibold">${b.role}</p>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${b.phone}</p>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button onclick="openBearerModal(${b.id})" title="തിരുത്തുക" class="p-1.5 text-slate-400 hover:text-incNavy"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                        <button onclick="deleteBearer(${b.id})" title="നീക്കം ചെയ്യുക" class="p-1.5 text-slate-400 hover:text-rose-600"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+
+        // 3. LEVY & PREVIOUS ARREARS LOGIC
+        function openLevyModal(editId = null) {
+            document.getElementById('levy-form').reset();
+            document.getElementById('levy-id').value = '';
+            document.getElementById('levy-modal-title').innerText = 'ജനപ്രതിനിധി ലെവി & കുടിശിക ചേർക്കുക';
+
+            if(editId) {
+                const l = levies.find(x => x.id === editId);
+                if(l) {
+                    document.getElementById('levy-id').value = l.id;
+                    document.getElementById('levy-name').value = l.name;
+                    document.getElementById('levy-level').value = l.level;
+                    document.getElementById('levy-constituency').value = l.constituency;
+                    document.getElementById('levy-phone').value = l.phone || '';
+                    document.getElementById('levy-previous-arrears').value = l.prevArrears || 0;
+                    document.getElementById('levy-target').value = l.target || 0;
+                    document.getElementById('levy-paid').value = l.paid || 0;
+                    document.getElementById('levy-pending').value = l.pending || 0;
+                    document.getElementById('levy-unpaid-months').value = l.unpaidMonths || '';
+                    document.getElementById('levy-modal-title').innerText = 'ലെവി വിവരം തിരുത്തുക';
+                }
+            }
+            openModal('levy-modal');
+        }
+
+        function handleSaveLevy(e) {
+            e.preventDefault();
+            const id = document.getElementById('levy-id').value;
+            const prevArrears = Number(document.getElementById('levy-previous-arrears').value) || 0;
+            const target = Number(document.getElementById('levy-target').value) || 0;
+            const paid = Number(document.getElementById('levy-paid').value) || 0;
+            const pending = Number(document.getElementById('levy-pending').value) || 0;
+
+            const levyObj = {
+                id: id ? Number(id) : Date.now(),
+                name: document.getElementById('levy-name').value,
+                level: document.getElementById('levy-level').value,
+                constituency: document.getElementById('levy-constituency').value,
+                phone: document.getElementById('levy-phone').value || '-',
+                prevArrears: prevArrears,
+                target: target,
+                paid: paid,
+                pending: pending,
+                unpaidMonths: document.getElementById('levy-unpaid-months').value || '-'
+            };
+
+            if(id) {
+                levies = levies.map(l => l.id === Number(id) ? levyObj : l);
+            } else {
+                levies.unshift(levyObj);
+            }
+
+            saveData();
+            closeModal('levy-modal');
+        }
+
+        function deleteLevy(id) {
+            if(confirm('ഈ ലെവി റെക്കോർഡ് നീക്കം ചെയ്യണമോ?')) {
+                levies = levies.filter(l => l.id !== id);
+                saveData();
+            }
+        }
+
+        function renderLevy() {
+            const search = document.getElementById('levy-search').value.toLowerCase();
+            const level = document.getElementById('levy-filter-level').value;
+            const status = document.getElementById('levy-filter-status').value;
+            const tbody = document.getElementById('levy-table-body');
+
+            const filtered = levies.filter(l => {
+                const matchSearch = l.name.toLowerCase().includes(search) || 
+                                    l.constituency.toLowerCase().includes(search) || 
+                                    (l.phone && l.phone.includes(search));
+                const matchLevel = level === 'ALL' || l.level === level;
+                
+                let matchStatus = true;
+                if(status === 'Pending') matchStatus = Number(l.pending) > 0;
+                if(status === 'Paid') matchStatus = Number(l.pending) <= 0;
+
+                return matchSearch && matchLevel && matchStatus;
+            });
+
+            document.getElementById('levy-count-tag').innerText = filtered.length;
+
+            let sumPrev = 0;
+            let sumCollected = 0;
+            let sumPending = 0;
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-slate-400 text-xs">ലെവി റെക്കോർഡുകൾ ഒന്നും ലഭ്യമല്ല. വിവരങ്ങൾ ചേർക്കുക.</td></tr>`;
+                document.getElementById('levy-sum-previous').innerText = '₹0';
+                document.getElementById('levy-sum-collected').innerText = '₹0';
+                document.getElementById('levy-sum-pending').innerText = '₹0';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(l => {
+                const prevVal = Number(l.prevArrears) || 0;
+                const targetVal = Number(l.target) || 0;
+                const paidVal = Number(l.paid) || 0;
+                const pendingVal = Number(l.pending) || 0;
+
+                sumPrev += prevVal;
+                sumCollected += paidVal;
+                sumPending += pendingVal;
+
+                const isPending = pendingVal > 0;
+
+                return `
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="p-3 font-bold text-slate-900">${l.name}</td>
+                        <td class="p-3">
+                            <span class="font-semibold block text-slate-800">${l.constituency}</span>
+                            <span class="text-[10px] text-slate-500">${l.level}</span>
+                        </td>
+                        <td class="p-3 text-right font-bold text-slate-700">₹${targetVal.toLocaleString('en-IN')}</td>
+                        <td class="p-3 text-right font-bold text-amber-800 bg-amber-50/30">₹${prevVal.toLocaleString('en-IN')}</td>
+                        <td class="p-3 text-right font-bold text-emerald-700 bg-emerald-50/30">₹${paidVal.toLocaleString('en-IN')}</td>
+                        <td class="p-3 text-right font-bold text-rose-700 bg-rose-50/40">₹${pendingVal.toLocaleString('en-IN')}</td>
+                        <td class="p-3 text-xs text-slate-600 max-w-xs">${l.unpaidMonths || '-'}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${isPending ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">
+                                ${isPending ? '<i class="fa-solid fa-circle-exclamation"></i> കുടിശിക' : '<i class="fa-solid fa-check"></i> പൂർണ്ണം'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="openLevyModal(${l.id})" title="തിരുത്തുക" class="text-slate-400 hover:text-incNavy p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteLevy(${l.id})" title="നീക്കം ചെയ്യുക" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('levy-sum-previous').innerText = `₹${sumPrev.toLocaleString('en-IN')}`;
+            document.getElementById('levy-sum-collected').innerText = `₹${sumCollected.toLocaleString('en-IN')}`;
+            document.getElementById('levy-sum-pending').innerText = `₹${sumPending.toLocaleString('en-IN')}`;
+        }
+
+        function exportLevyCSV() {
+            if(levies.length === 0) {
+                alert('ഡൗൺലോഡ് ചെയ്യാൻ ഡാറ്റ ഒന്നുമില്ല.');
+                return;
+            }
+            let csv = "പേര്,തലം,മണ്ഡലം,ഫോൺ,പ്രതിമാസ ലെവി,മുൻകാല കുടിശിക,അടച്ച തുക,ആകെ കുടിശിക,അടയ്ക്കാത്ത മാസങ്ങൾ\n";
+            levies.forEach(l => {
+                csv += `"${l.name}","${l.level}","${l.constituency}","${l.phone || ''}","${l.target}","${l.prevArrears}","${l.paid}","${l.pending}","${l.unpaidMonths || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `DCC_Wayanad_Levy_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+
+        // 4. ACTIVITIES LOGIC
+        function openActivityModal(editId = null) {
+            document.getElementById('activity-form').reset();
+            document.getElementById('act-id').value = '';
+            document.getElementById('act-modal-title').innerText = 'പ്രവർത്തനം / വാർത്ത ചേർക്കുക';
+
+            if(editId) {
+                const a = activities.find(x => x.id === editId);
+                if(a) {
+                    document.getElementById('act-id').value = a.id;
+                    document.getElementById('act-title').value = a.title;
+                    document.getElementById('act-date').value = a.date;
+                    document.getElementById('act-location').value = a.location;
+                    document.getElementById('act-desc').value = a.desc;
+                    document.getElementById('act-modal-title').innerText = 'പ്രവർത്തനം തിരുത്തുക';
+                }
+            }
+            openModal('activity-modal');
+        }
+
+        function handleSaveActivity(e) {
+            e.preventDefault();
+            const id = document.getElementById('act-id').value;
+            const actObj = {
+                id: id ? Number(id) : Date.now(),
+                title: document.getElementById('act-title').value,
+                date: document.getElementById('act-date').value,
+                location: document.getElementById('act-location').value,
+                desc: document.getElementById('act-desc').value
+            };
+
+            if(id) {
+                activities = activities.map(a => a.id === Number(id) ? actObj : a);
+            } else {
+                activities.unshift(actObj);
+            }
+
+            saveData();
+            closeModal('activity-modal');
+        }
+
+        function deleteActivity(id) {
+            if(confirm('ഈ വാർത്ത / പ്രവർത്തനം മായ്ക്കണോ?')) {
+                activities = activities.filter(a => a.id !== id);
+                saveData();
+            }
+        }
+
+        function renderActivities() {
+            const container = document.getElementById('activities-grid');
+            if(activities.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-xs bg-white rounded-xl border">പ്രവർത്തനങ്ങൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല.</div>`;
+                return;
+            }
+
+            container.innerHTML = activities.map(a => `
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-500 mb-2">
+                            <span><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${a.location}</span>
+                            <span>${a.date}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm mb-2 leading-snug">${a.title}</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">${a.desc}</p>
+                    </div>
+                    <div class="pt-3 mt-3 border-t border-slate-100 flex justify-end gap-2">
+                        <button onclick="openActivityModal(${a.id})" class="text-xs text-slate-500 hover:text-incNavy font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i> തിരുത്തുക</button>
+                        <button onclick="deleteActivity(${a.id})" class="text-xs text-slate-500 hover:text-rose-600 font-semibold"><i class="fa-solid fa-trash mr-1"></i> നീക്കം ചെയ്യുക</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Full JSON Export Backup
+        function exportData() {
+            const fullData = {
+                bearers,
+                levies,
+                activities,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `DCC_Wayanad_Full_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+    </script>
+</body>
+</html>
+```
